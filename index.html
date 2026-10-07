@@ -1,0 +1,662 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Winter Arc</title>
+<meta name="description" content="A shared daily checklist and leaderboard for your Winter Arc challenge.">
+<meta name="theme-color" content="#141a3c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Winter Arc">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#141a3c;--bg2:#24206b;--bg3:#0d4f63;
+  --card:rgba(255,255,255,.09);--card-strong:rgba(255,255,255,.15);--line:rgba(255,255,255,.16);
+  --ink:#f5f8ff;--muted:#b7c2e6;--ice:#8be9fd;--pink:#ff6b9d;--gold:#ffd166;--mint:#7bf1a8;--violet:#b388ff;--orange:#ff9f43;
+  --radius:20px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--bg1) linear-gradient(160deg,var(--bg1) 0%,var(--bg2) 45%,var(--bg3) 100%) fixed;
+  color:var(--ink);font-family:Nunito,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;
+  padding:env(safe-area-inset-top) 0 calc(84px + env(safe-area-inset-bottom));overflow-x:hidden;
+}
+h1,h2,h3,.display{font-family:"Baloo 2",Nunito,system-ui,sans-serif;margin:0;line-height:1.1}
+button{font:inherit;color:inherit;cursor:pointer}
+input,select{font:inherit;color:var(--ink);background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%;min-width:0}
+input:focus,select:focus{outline:2px solid var(--ice);outline-offset:1px}
+.snow{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.snow i{position:absolute;top:-20px;color:#fff;opacity:.55;animation:fall linear infinite;font-style:normal}
+@keyframes fall{to{transform:translate3d(30px,110vh,0) rotate(240deg)}}
+@media (prefers-reduced-motion:reduce){.snow{display:none}}
+.wrap{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:16px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 14px}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand .logo{font-size:30px;filter:drop-shadow(0 0 10px rgba(139,233,253,.6))}
+.brand h1{font-size:24px;background:linear-gradient(90deg,#fff,var(--ice),var(--violet));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand small{display:block;color:var(--muted);font-size:12px;font-weight:600}
+.me-chip{display:flex;align-items:center;gap:6px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--card-strong);border:1px solid var(--line);white-space:nowrap;font-weight:700;font-size:14px}
+.avatar{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:17px;flex:none}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);margin-bottom:14px}
+.sync{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 8px var(--mint)}
+.dot.off{background:var(--orange);box-shadow:0 0 8px var(--orange)}
+.dot.local{background:var(--violet);box-shadow:0 0 8px var(--violet)}
+/* Today */
+.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.daynav button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+.daynav button:disabled{opacity:.3}
+.daynav .lbl{text-align:center}
+.daynav .lbl b{font-family:"Baloo 2";font-size:20px;display:block}
+.daynav .lbl span{font-size:13px;color:var(--muted)}
+.hero{display:flex;align-items:center;gap:16px}
+.ring{position:relative;width:104px;height:104px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:"Baloo 2";font-size:28px;font-weight:800}
+.hero .msg{font-size:15px;color:var(--muted)}
+.hero .msg b{color:var(--ink);font-size:18px;display:block;font-family:"Baloo 2"}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.12)}
+.items{display:grid;gap:10px}
+.item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;border-radius:16px;border:1px solid var(--line);background:var(--card);transition:transform .12s,background .2s}
+.item:active{transform:scale(.98)}
+.item .em{font-size:26px;width:44px;height:44px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.1);flex:none}
+.item .t{flex:1;min-width:0}
+.item .t b{display:block;font-size:16px}
+.item .t span{font-size:12px;color:var(--muted);font-weight:700}
+.item .box{width:30px;height:30px;border-radius:10px;border:2px solid rgba(255,255,255,.4);display:grid;place-items:center;flex:none;font-weight:900}
+.item.on{background:linear-gradient(120deg,rgba(123,241,168,.28),rgba(139,233,253,.22));border-color:rgba(123,241,168,.6)}
+.item.on .box{background:var(--mint);border-color:var(--mint);color:#0b3b2a}
+.item.on .t b{text-decoration:line-through;text-decoration-color:rgba(255,255,255,.5)}
+.friends{display:grid;gap:8px}
+.frow{display:flex;align-items:center;gap:10px}
+.frow .bar{flex:1;height:10px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.frow .bar i{display:block;height:100%;border-radius:99px}
+.frow .n{font-weight:800;width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.frow .v{font-size:13px;font-weight:800;width:44px;text-align:right}
+/* Board */
+.podium{display:grid;gap:12px}
+.pcard{border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.25)}
+.pcard .rank{position:absolute;right:14px;top:8px;font-family:"Baloo 2";font-size:44px;font-weight:800;opacity:.35}
+.pcard .who{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pcard .who .avatar{width:46px;height:46px;font-size:26px;background:rgba(255,255,255,.25)}
+.pcard .who h3{font-size:22px}
+.pcard .who small{font-weight:800;opacity:.9}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:rgba(0,0,0,.18);border-radius:14px;padding:8px 4px;text-align:center}
+.stat b{display:block;font-family:"Baloo 2";font-size:22px;line-height:1.1}
+.stat span{font-size:11px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.03em}
+.crown{animation:bob 1.6s ease-in-out infinite;display:inline-block}
+@keyframes bob{50%{transform:translateY(-4px) rotate(-6deg)}}
+.arcbar{height:14px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden;margin:8px 0 4px}
+.arcbar i{display:block;height:100%;background:linear-gradient(90deg,var(--ice),var(--violet),var(--pink));border-radius:99px}
+.muted{color:var(--muted);font-size:13px}
+/* Calendar */
+.legend{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);margin:6px 0 14px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.heat{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.heat .wd{font-size:10px;color:var(--muted);text-align:center;font-weight:800}
+.cell{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;font-size:11px;font-weight:800;background:rgba(255,255,255,.07);color:rgba(255,255,255,.75);border:0;padding:0}
+.cell.future{opacity:.35}
+.cell.today{outline:2px solid #fff;outline-offset:1px}
+.cell.pad{background:transparent}
+.cell.perfect::after{content:"\2605";font-size:9px;position:absolute;margin:-18px 0 0 18px}
+.cell{position:relative;line-height:1}
+.cell .mon{display:block;font-size:8px;text-transform:uppercase;opacity:.9}
+.tabsw{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:10px}
+.tabsw button{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;white-space:nowrap;font-weight:800;font-size:14px}
+.tabsw button.sel{background:#fff;color:#1b1f4a}
+/* Settings */
+.row{display:flex;gap:8px;align-items:center}
+.row > *{flex:1}
+.field{display:grid;gap:4px;margin-bottom:10px}
+.field label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.edit-item{display:grid;grid-template-columns:52px 1fr 64px 40px;gap:6px;align-items:center;margin-bottom:8px}
+.edit-item input{padding:9px 8px}
+.edit-item .em-in{text-align:center;font-size:20px}
+.iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(255,107,157,.18);display:grid;place-items:center}
+.btn{border:0;border-radius:14px;padding:12px 16px;font-weight:800;background:linear-gradient(90deg,var(--ice),var(--violet));color:#151a3f;width:100%}
+.btn.ghost{background:var(--card-strong);color:var(--ink);border:1px solid var(--line)}
+.btn.small{width:auto;padding:8px 12px;font-size:14px}
+.btn:disabled{opacity:.5}
+.swatches{display:flex;gap:8px;flex-wrap:wrap}
+.swatches button{width:34px;height:34px;border-radius:50%;border:3px solid transparent}
+.swatches button.sel{border-color:#fff}
+.emojis{display:flex;gap:6px;flex-wrap:wrap}
+.emojis button{font-size:22px;width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card)}
+.emojis button.sel{background:#fff}
+code.link{display:block;word-break:break-all;font-size:12px;background:rgba(0,0,0,.3);padding:10px;border-radius:12px;color:var(--ice)}
+details summary{cursor:pointer;font-weight:800;margin-bottom:8px}
+/* Nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:5;display:flex;justify-content:center;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(15,18,48,.85);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+nav.tabs .in{display:flex;gap:4px;width:100%;max-width:560px}
+nav.tabs button{flex:1;border:0;background:transparent;border-radius:14px;padding:6px 0;display:grid;justify-items:center;gap:2px;font-size:11px;font-weight:800;color:var(--muted)}
+nav.tabs button span{font-size:22px}
+nav.tabs button.sel{background:rgba(255,255,255,.12);color:#fff}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#fff;color:#1b1f4a;font-weight:800;padding:10px 16px;border-radius:999px;z-index:20;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:90vw;text-align:center}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:30}
+.center{text-align:center}
+.big-emoji{font-size:56px;display:block;margin:8px 0}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="snow" id="snow" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<main class="wrap" id="app"></main>
+<nav class="tabs hidden" id="nav"><div class="in">
+  <button data-tab="today"><span>&#x2705;</span>Today</button>
+  <button data-tab="board"><span>&#x1F3C6;</span>Board</button>
+  <button data-tab="cal"><span>&#x1F4C5;</span>Calendar</button>
+  <button data-tab="settings"><span>&#x2699;&#xFE0F;</span>Setup</button>
+</div></nav>
+<script>
+"use strict";
+const COLORS=["#ff6b9d","#4cc9f0","#ffd166","#7bf1a8","#b388ff","#ff9f43","#f72585","#06d6a0"];
+const FACES=["\u{1F43B}‍❄️","\u{1F98A}","\u{1F427}","\u{1F43A}","\u{1F984}","\u{1F42F}","\u{1F985}","\u{1F98C}","❄️","\u{1F525}"];
+const PERFECT_BONUS=20;
+const DEFAULT_ITEMS=[
+  ["\u{1F3CB}️","Workout 45 min"],["\u{1F4A7}","Drink 3L water"],["\u{1F634}","Sleep 7+ hours"],["\u{1F4DA}","Read 20 pages"],
+  ["\u{1F957}","No junk food / sugar"],["\u{1F9D8}","Meditate 10 min"],["\u{1F4F5}","No doomscrolling"],["\u{1F6B6}","10k steps"]];
+const QUOTES=["Discipline is choosing what you want most over what you want now.","Quiet grind. Loud results.","The arc is built one checkbox at a time.","Cold outside, fire inside.","Show up, even on the grey days.","You vs. you. Every single day."];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid=(n=10)=>{const a="abcdefghijkmnpqrstuvwxyz23456789";let s="";const r=crypto.getRandomValues(new Uint8Array(n));for(const x of r)s+=a[x%a.length];return s};
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}},del(k){try{localStorage.removeItem(k)}catch{}}};
+
+/* ---------- dates (local calendar days as YYYY-MM-DD) ---------- */
+const pad2=n=>String(n).padStart(2,"0");
+const keyOf=d=>`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+const dateOf=k=>{const [y,m,d]=k.split("-").map(Number);return new Date(y,m-1,d)};
+const addDays=(k,n)=>{const d=dateOf(k);d.setDate(d.getDate()+n);return keyOf(d)};
+const diffDays=(a,b)=>Math.round((dateOf(b)-dateOf(a))/864e5);
+const todayKey=()=>keyOf(new Date());
+const fmtDay=k=>dateOf(k).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+const defaultLength=start=>{const end=`${start.slice(0,4)}-12-31`;const n=diffDays(start,end)+1;return n>=30?n:90};
+
+/* ---------- backends: same tiny API, path-level writes so two phones never clobber each other ---------- */
+function firebaseBackend(dbUrl,room){
+  const base=`${dbUrl}/rooms/${room}`;
+  let es=null,poll=null;
+  return {
+    kind:"firebase",
+    async get(){const r=await fetch(`${base}.json`,{cache:"no-store"});if(!r.ok)throw new Error(`HTTP ${r.status}`);return (await r.json())||{}},
+    async put(path,value){
+      const url=`${base}/${path}.json`;
+      const r=value==null?await fetch(url,{method:"DELETE"}):await fetch(url,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(value)});
+      if(!r.ok)throw new Error(`HTTP ${r.status}`);
+    },
+    subscribe(onChange){
+      const startPoll=()=>{if(!poll)poll=setInterval(()=>{if(!document.hidden)onChange()},20000)};
+      try{
+        es=new EventSource(`${base}.json`);
+        const ping=()=>onChange();
+        es.addEventListener("put",ping);es.addEventListener("patch",ping);
+        es.onerror=()=>{startPoll()};
+      }catch{}
+      startPoll();
+      document.addEventListener("visibilitychange",()=>{if(!document.hidden)onChange()});
+      addEventListener("online",onChange);
+    }
+  };
+}
+function localBackend(){
+  const K="wa-local-room";
+  return {
+    kind:"local",
+    async get(){return store.get(K,{})},
+    async put(path,value){const r=store.get(K,{});setPath(r,path,value);store.set(K,r)},
+    subscribe(onChange){addEventListener("storage",e=>{if(e.key===K)onChange()})}
+  };
+}
+function setPath(obj,path,value){
+  const parts=path.split("/");let o=obj;const trail=[];
+  for(let i=0;i<parts.length-1;i++){trail.push([o,parts[i]]);if(typeof o[parts[i]]!=="object"||o[parts[i]]===null)o[parts[i]]={};o=o[parts[i]]}
+  const last=parts[parts.length-1];
+  if(value==null){delete o[last];for(let i=trail.length-1;i>=0;i--){const [p,k]=trail[i];if(p[k]&&!Object.keys(p[k]).length)delete p[k];else break}}
+  else o[last]=value;
+}
+
+/* ---------- app state ---------- */
+const S={cfg:null,backend:null,room:null,me:null,tab:"today",day:todayKey(),online:true,calWho:null,queueKey:"",queue:[],flushing:false};
+
+function parseHash(){
+  const h=new URLSearchParams(location.hash.slice(1));
+  return {db:h.get("db"),r:h.get("r"),me:h.get("me"),local:h.get("local")};
+}
+function writeHash(){
+  const p=new URLSearchParams();
+  if(S.cfg.local)p.set("local","1");else{p.set("db",S.cfg.db);p.set("r",S.cfg.room)}
+  if(S.me)p.set("me",S.me);
+  history.replaceState(null,"","#"+p.toString());
+}
+function shareLink(){
+  const p=new URLSearchParams();p.set("db",S.cfg.db);p.set("r",S.cfg.room);
+  return `${location.origin}${location.pathname}#${p.toString()}`;
+}
+function normaliseDbUrl(u){
+  u=(u||"").trim().replace(/\/+$/,"").replace(/\.json$/,"");
+  if(!/^https?:\/\//.test(u))u="https://"+u;
+  try{const x=new URL(u);return `${x.protocol}//${x.host}`}catch{return null}
+}
+
+function boot(){
+  const h=parseHash();
+  let cfg=null;
+  if(h.local)cfg={local:true,room:"local"};
+  else if(h.db&&h.r){const db=normaliseDbUrl(h.db);if(db)cfg={db,room:h.r}}
+  if(!cfg)cfg=store.get("wa-last-cfg",null);
+  if(!cfg)return renderWelcome();
+  connect(cfg,h.me);
+}
+
+async function connect(cfg,meHint){
+  S.cfg=cfg;store.set("wa-last-cfg",cfg);
+  S.backend=cfg.local?localBackend():firebaseBackend(cfg.db,cfg.room);
+  const roomKey=cfg.local?"local":`${cfg.db}|${cfg.room}`;
+  S.queueKey="wa-queue-"+roomKey;S.queue=store.get(S.queueKey,[]);
+  S.meKey="wa-me-"+roomKey;
+  S.me=meHint||store.get(S.meKey,null);
+  S.room=store.get("wa-cache-"+roomKey,null);
+  S.cacheKey="wa-cache-"+roomKey;
+  if(S.room)afterLoad();
+  else $("#app").innerHTML=`<div class="card center" style="margin-top:30vh"><span class="big-emoji">❄️</span>Loading your arc...</div>`;
+  await refresh();
+  S.backend.subscribe(debounce(refresh,400));
+  flush();
+}
+function debounce(fn,ms){let t;return()=>{clearTimeout(t);t=setTimeout(fn,ms)}}
+
+async function refresh(){
+  try{
+    const snap=await S.backend.get();
+    S.online=true;
+    for(const op of S.queue)setPath(snap,op.path,op.value);
+    S.room=snap;store.set(S.cacheKey,snap);
+  }catch(err){
+    S.online=false;
+    if(!S.room){$("#app").innerHTML=`<div class="card center" style="margin-top:20vh"><span class="big-emoji">\u{1F976}</span><b>Can't reach the shared database.</b><p class="muted">${esc(err.message)}. Check your internet, or the database rules (see README).</p><button class="btn" onclick="location.reload()">Try again</button><p><button class="btn ghost small" onclick="resetDevice()">Use a different link</button></p></div>`;return}
+  }
+  afterLoad();
+}
+function afterLoad(){
+  if(S.me&&!(S.room.people||{})[S.me])S.me=null;
+  if(S.me)store.set(S.meKey,S.me);
+  writeHash();
+  if(!S.room.meta)return renderSetupRoom();
+  if(!S.me)return renderJoin();
+  render();
+}
+
+function write(path,value){
+  setPath(S.room,path,value);store.set(S.cacheKey,S.room);
+  S.queue.push({path,value});store.set(S.queueKey,S.queue);
+  flush();
+}
+async function flush(){
+  if(S.flushing)return;S.flushing=true;
+  try{
+    while(S.queue.length){
+      await S.backend.put(S.queue[0].path,S.queue[0].value);
+      S.queue.shift();store.set(S.queueKey,S.queue);
+      S.online=true;
+    }
+  }catch{S.online=false;setTimeout(()=>{S.flushing=false;flush()},8000);updateSync();return}
+  S.flushing=false;updateSync();
+}
+addEventListener("online",()=>flush());
+
+/* ---------- domain math ---------- */
+const meta=()=>S.room.meta;
+const endKey=()=>addDays(meta().start,meta().days-1);
+const people=()=>Object.entries(S.room.people||{}).map(([id,p])=>({id,...p})).sort((a,b)=>(a.joined||0)-(b.joined||0));
+const allItems=()=>Object.entries(S.room.items||{}).map(([id,it])=>({id,...it})).sort((a,b)=>(a.order||0)-(b.order||0));
+const itemsOn=k=>allItems().filter(it=>(!it.since||it.since<=k)&&(!it.until||k<it.until));
+const checked=(pid,k,iid)=>!!(((S.room.checks||{})[pid]||{})[k]||{})[iid];
+const anyChecks=()=>Object.keys(S.room.checks||{}).length>0;
+
+function dayStats(pid,k){
+  const its=itemsOn(k);const done=its.filter(it=>checked(pid,k,it.id));
+  const pct=its.length?done.length/its.length:0;
+  const pts=done.reduce((s,it)=>s+(Number(it.pts)||0),0)+(its.length&&pct===1?PERFECT_BONUS:0);
+  return {total:its.length,done:done.length,pct,pts};
+}
+function challengeDays(){
+  const out=[];const t=todayKey(),st=meta().start,end=endKey();
+  if(t<st)return out;
+  const last=t<end?t:end;
+  for(let k=st;k<=last;k=addDays(k,1))out.push(k);
+  return out;
+}
+function personSummary(pid){
+  const thr=(meta().streakPct??80)/100;const days=challengeDays();const t=todayKey();
+  let points=0,perfect=0,best=0,run=0;
+  const stats=days.map(k=>{const s=dayStats(pid,k);points+=s.pts;if(s.total&&s.pct===1)perfect++;return [k,s]});
+  for(const [k,s] of stats){if(s.total&&s.pct>=thr){run++;best=Math.max(best,run)}else if(k!==t)run=0}
+  let streak=0;
+  for(let i=stats.length-1;i>=0;i--){const [k,s]=stats[i];if(s.total&&s.pct>=thr)streak++;else if(k===t)continue;else break}
+  const today=dayStats(pid,t);
+  const avg=stats.length?stats.reduce((a,[,s])=>a+s.pct,0)/stats.length:0;
+  return {points,perfect,best,streak,today,avg};
+}
+function leaderboard(){
+  return people().map(p=>({...p,...personSummary(p.id)})).sort((a,b)=>b.points-a.points||b.streak-a.streak||b.today.pct-a.today.pct);
+}
+const heatColor=pct=>pct<=0?"rgba(255,255,255,.07)":pct<.34?"#2b6cb0":pct<.67?"#4cc9f0":pct<1?"#7bf1a8":"#ffd166";
+
+/* ---------- views ---------- */
+function shell(inner){
+  $("#app").innerHTML=`
+  <header class="top">
+    <div class="brand"><span class="logo">❄️</span><div style="min-width:0"><h1>${esc(meta().title||"Winter Arc")}</h1><small class="sync" id="sync"></small></div></div>
+    ${S.me?`<button class="me-chip" onclick="go('settings')">${avatar(S.room.people[S.me])}${esc(S.room.people[S.me].name)}</button>`:""}
+  </header>${inner}`;
+  $("#nav").classList.remove("hidden");
+  document.querySelectorAll("nav.tabs button").forEach(b=>b.classList.toggle("sel",b.dataset.tab===S.tab));
+  updateSync();
+}
+function updateSync(){
+  const el=$("#sync");if(!el)return;
+  if(S.cfg.local){el.innerHTML=`<i class="dot local"></i>This device only (demo)`;return}
+  const pending=S.queue.length;
+  el.innerHTML=S.online?`<i class="dot"></i>${pending?"Syncing...":"Live & synced"}`:`<i class="dot off"></i>Offline – ${pending} change${pending===1?"":"s"} waiting`;
+}
+const avatar=p=>`<span class="avatar" style="background:${esc(p.color)}">${esc(p.emoji)}</span>`;
+function render(){({today:renderToday,board:renderBoard,cal:renderCal,settings:renderSettings})[S.tab]()}
+function go(tab){S.tab=tab;render();scrollTo({top:0})}
+document.querySelectorAll("nav.tabs button").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+
+function ring(pct,size=104,stroke=11){
+  const r=(size-stroke)/2,c=2*Math.PI*r;
+  return `<div class="ring" style="width:${size}px;height:${size}px"><svg width="${size}" height="${size}"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#8be9fd"/><stop offset=".5" stop-color="#b388ff"/><stop offset="1" stop-color="#ff6b9d"/></linearGradient></defs>
+  <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="rgba(255,255,255,.14)" stroke-width="${stroke}" fill="none"/>
+  <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${pct>=1?"#ffd166":"url(#g)"}" stroke-width="${stroke}" fill="none" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}" style="transition:stroke-dashoffset .5s"/></svg>
+  <div class="pct">${Math.round(pct*100)}%</div></div>`;
+}
+
+function renderToday(){
+  const k=S.day,t=todayKey(),m=meta();
+  const st=dayStats(S.me,k);const its=itemsOn(k);
+  const dayNo=diffDays(m.start,k)+1;
+  const inRange=dayNo>=1&&dayNo<=m.days;
+  const sum=personSummary(S.me);
+  const lbl=k===t?"Today":k===addDays(t,-1)?"Yesterday":fmtDay(k);
+  const sub=inRange?`Day ${dayNo} of ${m.days} · ${fmtDay(k)}`:dayNo<1?`Starts in ${1-dayNo} day${dayNo===0?"":"s"} · practice run`:`Arc finished · ${fmtDay(k)}`;
+  const msg=st.pct>=1?["PERFECT DAY! \u{1F389}",`+${st.pts} pts incl. ${PERFECT_BONUS} bonus`]:st.pct>=.5?["Over halfway, keep going! \u{1F4AA}",`${st.total-st.done} left to lock in`]:st.done?["Momentum! ⚡",`${st.total-st.done} to go`]:[k===t?"Fresh day, fresh arc ❄️":"Nothing ticked",QUOTES[(dayNo+QUOTES.length*9)%QUOTES.length]];
+  const others=people().filter(p=>p.id!==S.me);
+  shell(`
+  <div class="daynav">
+    <button aria-label="Previous day" onclick="shiftDay(-1)" ${k<=addDays(m.start,-7)?"disabled":""}>◀</button>
+    <div class="lbl"><b>${lbl}</b><span>${sub}</span></div>
+    <button aria-label="Next day" onclick="shiftDay(1)" ${k>=t?"disabled":""}>▶</button>
+  </div>
+  <section class="card hero">${ring(st.pct)}<div class="msg"><b>${msg[0]}</b>${esc(msg[1])}
+    <div class="chips"><span class="chip">\u{1F525} ${sum.streak} day streak</span><span class="chip">⭐ ${sum.points} pts</span></div></div></section>
+  <section class="items">${its.length?its.map(it=>{const on=checked(S.me,k,it.id);return `
+    <button class="item ${on?"on":""}" onclick="toggle('${it.id}')" aria-pressed="${on}">
+      <span class="em">${esc(it.emoji||"⭐")}</span><span class="t"><b>${esc(it.label)}</b><span>+${Number(it.pts)||0} pts</span></span><span class="box">${on?"✓":""}</span>
+    </button>`}).join(""):`<div class="card center">No checklist items yet. <button class="btn small" onclick="go('settings')">Add some</button></div>`}</section>
+  ${others.length?`<section class="card" style="margin-top:14px"><h3 style="font-size:17px;margin-bottom:10px">${k===t?"Your crew today":"Your crew that day"}</h3><div class="friends">${others.map(p=>{const s=dayStats(p.id,k);return `
+    <div class="frow">${avatar(p)}<span class="n">${esc(p.name)}</span><span class="bar"><i style="width:${s.pct*100}%;background:${esc(p.color)}"></i></span><span class="v">${s.done}/${s.total}</span></div>`}).join("")}</div></section>`:
+  `<section class="card center" style="margin-top:14px"><b>Arc is better together \u{1F91D}</b><p class="muted">${S.cfg.local?"This is demo mode on one device. Set up a shared link from Setup to invite a friend.":"Send your friend the invite link so they can join."}</p>${S.cfg.local?"":`<button class="btn" onclick="shareInvite()">Invite a friend</button>`}</section>`}
+  `);
+}
+function shiftDay(n){const t=todayKey();let k=addDays(S.day,n);if(k>t)k=t;S.day=k;renderToday()}
+function toggle(iid){
+  const k=S.day;const was=dayStats(S.me,k).pct;
+  const on=!checked(S.me,k,iid);
+  write(`checks/${S.me}/${k}/${iid}`,on?true:null);
+  renderToday();
+  if(on&&navigator.vibrate)navigator.vibrate(12);
+  if(was<1&&dayStats(S.me,k).pct>=1)confetti();
+}
+
+function renderBoard(){
+  const lb=leaderboard();const m=meta();const t=todayKey();
+  const dayNo=Math.min(Math.max(diffDays(m.start,t)+1,0),m.days);
+  const medal=["\u{1F947}","\u{1F948}","\u{1F949}"];
+  const lead=lb[0];const tie=lb.length>1&&lb[1].points===lead.points;
+  shell(`
+  <section class="card">
+    <div class="row" style="justify-content:space-between"><h2 style="font-size:20px;flex:none">The Arc</h2><span class="muted" style="flex:none">Day ${dayNo} / ${m.days}</span></div>
+    <div class="arcbar"><i style="width:${dayNo/m.days*100}%"></i></div>
+    <div class="muted">${fmtDay(m.start)} → ${fmtDay(endKey())} · ${Math.max(m.days-dayNo,0)} days to go</div>
+    ${lb.length>1&&lead.points>0?`<p style="margin:12px 0 0;font-weight:800">${tie?"⚖️ Dead heat at the top! Next tick breaks the tie.":`<span class="crown">\u{1F451}</span> ${esc(lead.name)} leads by ${lead.points-lb[1].points} pts`}</p>`:""}
+  </section>
+  <section class="podium">${lb.map((p,i)=>`
+    <div class="pcard" style="background:linear-gradient(135deg,${esc(p.color)}cc,${esc(p.color)}55 60%,rgba(255,255,255,.06))">
+      <span class="rank">#${i+1}</span>
+      <div class="who">${avatar(p)}<div><h3>${i<3?medal[i]+" ":""}${esc(p.name)}${p.id===S.me?" <small>(you)</small>":""}</h3><small>Today ${p.today.done}/${p.today.total} · ${Math.round(p.today.pct*100)}%</small></div></div>
+      <div class="stats">
+        <div class="stat"><b>${p.points}</b><span>Points</span></div>
+        <div class="stat"><b>\u{1F525}${p.streak}</b><span>Streak</span></div>
+        <div class="stat"><b>${p.best}</b><span>Best</span></div>
+        <div class="stat"><b>⭐${p.perfect}</b><span>Perfect</span></div>
+      </div>
+      <div class="muted" style="color:#fff;opacity:.85;margin-top:8px;font-weight:700">Average completion ${Math.round(p.avg*100)}%</div>
+    </div>`).join("")}</section>
+  <p class="muted center" style="margin-top:14px">Points = item points + ${PERFECT_BONUS} bonus for a 100% day. A streak day needs ≥ ${m.streakPct??80}% done.</p>
+  `);
+}
+
+function renderCal(){
+  const ps=people();if(!S.calWho||!ps.find(p=>p.id===S.calWho))S.calWho=S.me;
+  const m=meta(),t=todayKey();
+  const pid=S.calWho;const p=S.room.people[pid];
+  const first=dateOf(m.start);const lead=(first.getDay()+6)%7;
+  let cells="";for(let i=0;i<lead;i++)cells+=`<span class="cell pad"></span>`;
+  for(let i=0;i<m.days;i++){
+    const k=addDays(m.start,i);const fut=k>t;const s=fut?null:dayStats(pid,k);
+    const bg=fut?"rgba(255,255,255,.07)":heatColor(s.pct);
+    cells+=`<button class="cell ${fut?"future":""} ${k===t?"today":""} ${s&&s.pct===1?"perfect":""}" style="background:${bg};${s&&s.pct>=.67?"color:#14213d":""}" title="${fmtDay(k)}${s?` – ${s.done}/${s.total}`:""}" ${fut||pid!==S.me?"disabled":`onclick="openDay('${k}')"`}>${dateOf(k).getDate()===1||i===0?`<small class="mon">${dateOf(k).toLocaleDateString(undefined,{month:"short"})}</small>`:""}${dateOf(k).getDate()}</button>`;
+  }
+  const sum=personSummary(pid);
+  shell(`
+  <div class="tabsw">${ps.map(x=>`<button class="${x.id===pid?"sel":""}" onclick="S.calWho='${x.id}';renderCal()">${esc(x.emoji)} ${esc(x.name)}</button>`).join("")}</div>
+  <section class="card">
+    <h2 style="font-size:20px">${esc(p.name)}'s arc</h2>
+    <div class="legend">0% <i style="background:rgba(255,255,255,.07)"></i><i style="background:#2b6cb0"></i><i style="background:#4cc9f0"></i><i style="background:#7bf1a8"></i><i style="background:#ffd166"></i> 100% ★</div>
+    <div class="heat">${["M","T","W","T","F","S","S"].map(d=>`<span class="wd">${d}</span>`).join("")}${cells}</div>
+    <div class="chips" style="margin-top:14px"><span class="chip">\u{1F525} ${sum.streak} current</span><span class="chip">\u{1F3C5} ${sum.best} best</span><span class="chip">⭐ ${sum.perfect} perfect days</span><span class="chip">${Math.round(sum.avg*100)}% avg</span></div>
+    ${pid===S.me?`<p class="muted" style="margin-bottom:0">Tap a past day to fix a missed tick.</p>`:""}
+  </section>`);
+}
+function openDay(k){S.day=k;go("today")}
+
+const EMOJI_PICK=["\u{1F3CB}️","\u{1F3C3}","\u{1F6B6}","\u{1F9D8}","\u{1F4A7}","\u{1F957}","\u{1F34E}","\u{1F634}","\u{1F4DA}","✍️","\u{1F4F5}","\u{1F6BF}","\u{1F31E}","\u{1F48A}","\u{1F9E0}","\u{1F64F}","\u{1F6AD}","\u{1F4B0}","\u{1F9F9}","⭐"];
+function renderSettings(){
+  const m=meta();const me=S.room.people[S.me];const its=allItems().filter(it=>!it.until);
+  shell(`
+  <section class="card">
+    <h2 style="font-size:20px;margin-bottom:12px">\u{1F4CB} Daily checklist <span class="muted">(shared)</span></h2>
+    <div id="items">${its.map(it=>`
+      <div class="edit-item" data-id="${it.id}">
+        <input class="em-in" value="${esc(it.emoji)}" maxlength="4" aria-label="Emoji" onchange="saveItem('${it.id}','emoji',this.value)">
+        <input value="${esc(it.label)}" maxlength="40" aria-label="Item name" onchange="saveItem('${it.id}','label',this.value)">
+        <input type="number" min="0" max="100" value="${Number(it.pts)||0}" aria-label="Points" onchange="saveItem('${it.id}','pts',this.value)">
+        <button class="iconbtn" aria-label="Remove ${esc(it.label)}" onclick="removeItem('${it.id}')">\u{1F5D1}️</button>
+      </div>`).join("")}</div>
+    <div class="muted" style="margin:4px 0 8px">Emoji · name · points</div>
+    <div class="edit-item">
+      <input class="em-in" id="newEm" value="⭐" maxlength="4" aria-label="New item emoji">
+      <input id="newLabel" placeholder="e.g. Cold shower" maxlength="40" aria-label="New item name" onkeydown="if(event.key==='Enter')addItem()">
+      <input type="number" id="newPts" min="0" max="100" value="10" aria-label="New item points">
+      <button class="iconbtn" style="background:rgba(123,241,168,.3)" aria-label="Add item" onclick="addItem()">➕</button>
+    </div>
+    <div class="emojis" style="margin-top:6px">${EMOJI_PICK.map(e=>`<button onclick="$('#newEm').value='${e}'">${e}</button>`).join("")}</div>
+  </section>
+  <section class="card">
+    <h2 style="font-size:20px;margin-bottom:12px">\u{1F4C6} Challenge</h2>
+    <div class="field"><label for="title">Name</label><input id="title" value="${esc(m.title)}" maxlength="30" onchange="saveMeta('title',this.value.trim()||'Winter Arc')"></div>
+    <div class="row">
+      <div class="field"><label for="start">Start date</label><input type="date" id="start" value="${m.start}" onchange="if(this.value)saveMeta('start',this.value)"></div>
+      <div class="field"><label for="days">Length (days)</label><input type="number" id="days" min="7" max="366" value="${m.days}" onchange="saveMeta('days',Math.min(366,Math.max(7,parseInt(this.value)||90)))"></div>
+    </div>
+    <div class="field"><label for="thr">Streak counts when a day is at least</label>
+      <select id="thr" onchange="saveMeta('streakPct',Number(this.value))">${[50,60,70,80,90,100].map(v=>`<option value="${v}" ${v===(m.streakPct??80)?"selected":""}>${v}% done</option>`).join("")}</select></div>
+    <div class="muted">Ends ${fmtDay(endKey())}.</div>
+  </section>
+  <section class="card">
+    <h2 style="font-size:20px;margin-bottom:12px;display:flex;align-items:center;gap:8px">${avatar(me)} You</h2>
+    <div class="field"><label for="myname">Your name</label><input id="myname" value="${esc(me.name)}" maxlength="18" onchange="savePerson('name',this.value.trim()||'Me')"></div>
+    <div class="field"><label>Your animal</label><div class="emojis">${FACES.map(f=>`<button class="${f===me.emoji?"sel":""}" onclick="savePerson('emoji','${f}')">${f}</button>`).join("")}</div></div>
+    <div class="field"><label>Your colour</label><div class="swatches">${COLORS.map(c=>`<button class="${c===me.color?"sel":""}" style="background:${c}" aria-label="colour ${c}" onclick="savePerson('color','${c}')"></button>`).join("")}</div></div>
+    <button class="btn ghost" onclick="switchUser()">Not ${esc(me.name)}? Switch person</button>
+  </section>
+  <section class="card">
+    <h2 style="font-size:20px;margin-bottom:12px">\u{1F91D} Invite</h2>
+    ${S.cfg.local?`<p class="muted">Demo mode: data lives only on this device. To share with a friend, create a shared challenge (needs a free Firebase database URL, see README).</p><button class="btn" onclick="resetDevice()">Create a shared challenge</button>`:
+    `<p class="muted">Anyone with this link can join and tick their own list. Send it only to your crew.</p><code class="link">${esc(shareLink())}</code>
+    <div class="row" style="margin-top:10px"><button class="btn" onclick="shareInvite()">Share link</button><button class="btn ghost" onclick="copyText(shareLink())">Copy</button></div>`}
+  </section>
+  <section class="card">
+    <details><summary>Install on your phone</summary>
+    <p class="muted"><b>iPhone (Safari):</b> tap the Share button → <i>Add to Home Screen</i> → Add.<br><b>Android (Chrome):</b> tap ⋮ → <i>Add to Home screen</i> / <i>Install app</i>.</p></details>
+    <details><summary>Device &amp; data</summary>
+    <p class="muted">${S.cfg.local?"Stored on this device only.":`Shared database: ${esc(S.cfg.db)}<br>Room: ${esc(S.cfg.room)}`}</p>
+    <button class="btn ghost small" onclick="resetDevice()">Leave this challenge on this device</button></details>
+  </section>`);
+}
+function saveItem(id,f,v){if(f==="pts")v=Math.max(0,Math.min(100,parseInt(v)||0));else v=String(v).trim();if(f==="label"&&!v)return renderSettings();write(`items/${id}/${f}`,v);toast("Saved ✔")}
+function addItem(){
+  const label=$("#newLabel").value.trim();if(!label){$("#newLabel").focus();return}
+  const id=uid(8);const t=todayKey();
+  const since=!anyChecks()||t<meta().start?meta().start:t;
+  const order=Math.max(0,...allItems().map(i=>i.order||0))+1;
+  write(`items/${id}`,{label,emoji:$("#newEm").value.trim()||"⭐",pts:Math.max(0,Math.min(100,parseInt($("#newPts").value)||0)),order,since});
+  renderSettings();toast(`Added "${label}" for everyone \u{1F389}`);
+}
+function removeItem(id){
+  const it=S.room.items[id];if(!confirm(`Remove "${it.label}" from everyone's list?`))return;
+  const used=Object.values(S.room.checks||{}).some(byDay=>Object.values(byDay).some(d=>d[id]));
+  const t=todayKey();
+  if(used&&t>(it.since||meta().start))write(`items/${id}/until`,t);else write(`items/${id}`,null);
+  renderSettings();toast("Removed");
+}
+function saveMeta(f,v){write(`meta/${f}`,v);render();toast("Saved ✔")}
+function savePerson(f,v){write(`people/${S.me}/${f}`,v);render()}
+function switchUser(){S.me=null;store.del(S.meKey);writeHash();renderJoin()}
+function resetDevice(){if(!confirm("Leave this challenge on this device? (Shared data is kept.)"))return;store.del("wa-last-cfg");if(S.meKey)store.del(S.meKey);location.hash="";location.reload()}
+async function shareInvite(){
+  const url=shareLink();const text=`Join my ${meta().title} challenge ❄️\u{1F525}`;
+  if(navigator.share){try{await navigator.share({title:meta().title,text,url});return}catch(e){if(e.name==="AbortError")return}}
+  copyText(url);
+}
+async function copyText(s){try{await navigator.clipboard.writeText(s);toast("Link copied \u{1F4CB}")}catch{prompt("Copy this link:",s)}}
+function toast(msg){const d=document.createElement("div");d.className="toast";d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),1800)}
+
+/* ---------- onboarding ---------- */
+function renderWelcome(){
+  $("#nav").classList.add("hidden");
+  $("#app").innerHTML=`
+  <div class="center" style="margin:6vh 0 18px"><span class="big-emoji">❄️\u{1F525}</span><h1 class="display" style="font-size:40px">Winter Arc</h1><p class="muted">One shared checklist. Daily ticks. Friendly rivalry.</p></div>
+  <section class="card">
+    <h2 style="font-size:20px">Got an invite link?</h2>
+    <p class="muted">Paste it here (or just open the link on this phone).</p>
+    <div class="row"><input id="invite" placeholder="https://...#db=...&r=..."><button class="btn small" style="flex:none" onclick="useInvite()">Join</button></div>
+  </section>
+  <section class="card">
+    <h2 style="font-size:20px">Start a new shared challenge</h2>
+    <p class="muted">Paste your free Firebase Realtime Database URL (one-time setup, see README).</p>
+    <div class="field"><label for="dburl">Database URL</label><input id="dburl" placeholder="https://your-project-default-rtdb.firebaseio.com" autocapitalize="off" autocorrect="off"></div>
+    <button class="btn" id="createBtn" onclick="createShared()">Create challenge \u{1F680}</button>
+    <p class="muted" id="createErr"></p>
+  </section>
+  <button class="btn ghost" onclick="connect({local:true,room:'local'})">Just try it on this device (demo)</button>`;
+}
+function useInvite(){
+  const v=$("#invite").value.trim();const i=v.indexOf("#");if(i<0)return toast("That link has no challenge in it");
+  location.hash=v.slice(i);location.reload();
+}
+async function createShared(){
+  const db=normaliseDbUrl($("#dburl").value);const err=$("#createErr");
+  if(!db)return err.textContent="That doesn't look like a URL.";
+  $("#createBtn").disabled=true;err.textContent="Checking database...";
+  const room=uid(12);
+  try{
+    const be=firebaseBackend(db,room);
+    await be.get();
+  }catch(e){$("#createBtn").disabled=false;err.textContent=`Couldn't reach it (${e.message}). Check the URL and the database rules from the README.`;return}
+  err.textContent="";
+  connect({db,room});
+}
+function renderSetupRoom(){
+  $("#nav").classList.add("hidden");
+  const t=todayKey();
+  $("#app").innerHTML=`
+  <div class="center" style="margin:4vh 0 14px"><span class="big-emoji">\u{1F3D4}️</span><h1 class="display" style="font-size:32px">Set up your arc</h1><p class="muted">You can change all of this later.</p></div>
+  <section class="card">
+    <div class="field"><label for="s-title">Challenge name</label><input id="s-title" value="Winter Arc" maxlength="30"></div>
+    <div class="row">
+      <div class="field"><label for="s-start">Start date</label><input type="date" id="s-start" value="${t}" onchange="$('#s-days').value=defaultLength(this.value)"></div>
+      <div class="field"><label for="s-days">Length (days)</label><input type="number" id="s-days" min="7" max="366" value="${defaultLength(t)}"></div>
+    </div>
+    <p class="muted" style="margin-top:0">Default runs to Dec 31. We'll start you with a classic Winter Arc checklist that you can edit together.</p>
+    <button class="btn" onclick="createRoom()">Let's go ❄️</button>
+  </section>`;
+}
+function createRoom(){
+  const start=$("#s-start").value||todayKey();
+  write("meta",{title:$("#s-title").value.trim()||"Winter Arc",start,days:Math.min(366,Math.max(7,parseInt($("#s-days").value)||90)),streakPct:80,created:Date.now()});
+  DEFAULT_ITEMS.forEach(([emoji,label],i)=>write(`items/${uid(8)}`,{emoji,label,pts:10,order:i+1,since:start}));
+  afterLoad();
+}
+function renderJoin(){
+  $("#nav").classList.add("hidden");
+  const ps=people();const used=new Set(ps.map(p=>p.color));
+  const color=COLORS.find(c=>!used.has(c))||COLORS[ps.length%COLORS.length];
+  S.joinPick={emoji:FACES[ps.length%FACES.length],color};
+  $("#app").innerHTML=`
+  <div class="center" style="margin:4vh 0 14px"><span class="big-emoji">\u{1F44B}</span><h1 class="display" style="font-size:32px">${esc(meta().title)}</h1><p class="muted">Who's ticking on this phone?</p></div>
+  ${ps.length?`<section class="card"><h2 style="font-size:18px;margin-bottom:10px">I'm already in</h2><div class="friends">${ps.map(p=>`<button class="item" onclick="pickMe('${p.id}')">${avatar(p)}<span class="t"><b>${esc(p.name)}</b></span><span>→</span></button>`).join("")}</div></section>`:""}
+  <section class="card">
+    <h2 style="font-size:18px;margin-bottom:10px">${ps.length?"I'm new here":"Create your player"}</h2>
+    <div class="field"><label for="j-name">Your name</label><input id="j-name" maxlength="18" placeholder="e.g. Harsha" onkeydown="if(event.key==='Enter')joinNew()"></div>
+    <div class="field"><label>Pick an animal</label><div class="emojis" id="j-faces">${FACES.map(f=>`<button class="${f===S.joinPick.emoji?"sel":""}" onclick="S.joinPick.emoji='${f}';markSel('#j-faces',this)">${f}</button>`).join("")}</div></div>
+    <div class="field"><label>Pick a colour</label><div class="swatches" id="j-cols">${COLORS.map(c=>`<button class="${c===color?"sel":""}" style="background:${c}" aria-label="colour ${c}" onclick="S.joinPick.color='${c}';markSel('#j-cols',this)"></button>`).join("")}</div></div>
+    <button class="btn" onclick="joinNew()">Join the arc \u{1F525}</button>
+  </section>`;
+}
+function markSel(sel,btn){document.querySelectorAll(sel+" button").forEach(b=>b.classList.toggle("sel",b===btn))}
+function pickMe(id){S.me=id;store.set(S.meKey,id);writeHash();S.tab="today";S.day=todayKey();render()}
+function joinNew(){
+  const name=$("#j-name").value.trim();if(!name){$("#j-name").focus();return toast("Add your name first")}
+  const id=uid(8);
+  write(`people/${id}`,{name,emoji:S.joinPick.emoji,color:S.joinPick.color,joined:Date.now()});
+  pickMe(id);toast(`Welcome, ${name}! ❄️`);
+}
+
+/* ---------- confetti + snow ---------- */
+function confetti(){
+  const cv=$("#confetti");const ctx=cv.getContext("2d");const dpr=devicePixelRatio||1;
+  cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;ctx.scale(dpr,dpr);
+  const cols=["#ff6b9d","#ffd166","#7bf1a8","#8be9fd","#b388ff","#fff"];
+  const ps=Array.from({length:160},()=>({x:innerWidth/2,y:innerHeight*.35,vx:(Math.random()-.5)*14,vy:-Math.random()*14-4,s:Math.random()*7+4,c:cols[Math.random()*cols.length|0],r:Math.random()*6,vr:(Math.random()-.5)*.3}));
+  const t0=performance.now();
+  (function frame(t){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    for(const p of ps){p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);ctx.restore()}
+    if(t-t0<3000)requestAnimationFrame(frame);else ctx.clearRect(0,0,innerWidth,innerHeight);
+  })(t0);
+}
+(function snow(){const el=$("#snow");let h="";for(let i=0;i<18;i++)h+=`<i style="left:${Math.random()*100}%;font-size:${8+Math.random()*12}px;animation-duration:${9+Math.random()*12}s;animation-delay:-${Math.random()*20}s">❄</i>`;el.innerHTML=h})();
+
+/* midnight rollover: keep "today" current when the app stays open */
+setInterval(()=>{const t=todayKey();if(S.lastToday&&S.lastToday!==t&&S.day===S.lastToday){S.day=t;if(S.me&&S.room&&S.room.meta)render()}S.lastToday=t},60000);
+S.lastToday=todayKey();
+
+if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("sw.js").catch(()=>{});
+boot();
+</script>
+</body>
+</html>
