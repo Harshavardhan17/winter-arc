@@ -83,6 +83,41 @@ input:focus,select:focus{outline:2px solid var(--ice);outline-offset:1px}
 .frow .bar i{display:block;height:100%;border-radius:99px}
 .frow .n{font-weight:800;width:92px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
 .frow .v{font-size:13px;font-weight:800;width:44px;text-align:right}
+.banner{padding:12px 16px;font-size:15px}
+.banner b{font-family:"Baloo 2";font-size:17px}
+.cmpcard{padding:14px 12px}
+.cmp{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.cgrid{display:grid;align-items:center;row-gap:4px;column-gap:4px}
+.cgrid .lab{display:flex;align-items:center;gap:8px;min-width:0;padding:4px 4px 4px 0}
+.cgrid.wide .lab{position:sticky;left:0;z-index:1;background:linear-gradient(90deg,#232766 88%,rgba(35,39,102,0))}
+.cgrid .lab.head{font-family:"Baloo 2";font-size:16px;font-weight:800;align-self:end;padding-bottom:10px}
+.cgrid .lab .em{font-size:20px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.1);flex:none}
+.cgrid .lab .tx{min-width:0;display:grid}
+.cgrid .lab .tx b{font-size:14px;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cgrid .lab .tx small{font-size:11px;color:var(--muted);font-weight:700}
+.ph{position:relative;display:grid;justify-items:center;gap:2px;padding:8px 2px 6px;border-radius:14px;background:linear-gradient(180deg,color-mix(in srgb,var(--c) 45%,transparent),transparent);text-align:center;min-width:0}
+.ph.me{outline:2px solid color-mix(in srgb,var(--c) 70%,transparent)}
+.ph b{font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ph small{font-size:11px;font-weight:800;opacity:.9;white-space:nowrap}
+.ph .crown{position:absolute;top:-6px;right:4px;font-size:16px}
+.cc{display:grid;place-items:center;height:44px;border:0;background:transparent;padding:0;border-radius:12px}
+.cc.mine{background:rgba(255,255,255,.06)}
+.cc.mine:active{transform:scale(.94)}
+.cc .box{width:30px;height:30px;border-radius:10px;border:2px solid rgba(255,255,255,.45);display:grid;place-items:center;font-weight:900}
+.cc.mine.on .box{background:var(--mint);border-color:var(--mint);color:#0b3b2a}
+.cc .tick{width:24px;height:24px;border-radius:50%;border:2px dashed rgba(255,255,255,.22);display:grid;place-items:center;font-weight:900;font-size:13px;color:#14213d}
+.sec{grid-column:1/-1;margin-top:10px;padding:8px 10px;border-radius:12px;background:linear-gradient(90deg,rgba(255,209,102,.25),rgba(179,136,255,.15));font-weight:800;font-size:14px}
+.sec small{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.addopt{margin-top:12px;width:100%}
+.optform{display:grid;grid-template-columns:48px 1fr 56px 40px;gap:6px;margin-top:12px}
+.optform input{padding:9px 8px}
+.iconbtn.opt{background:rgba(255,255,255,.08);filter:grayscale(1);opacity:.6}
+.iconbtn.opt.on{background:rgba(255,209,102,.35);filter:none;opacity:1}
+.check{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);font-weight:700;margin-top:4px}
+.check input{width:auto}
+button.lab{border:0;background:transparent;text-align:left;color:inherit;font:inherit;cursor:pointer;border-radius:10px}
+.sheet-bg{position:fixed;inset:0;z-index:25;background:rgba(5,8,25,.6);display:flex;align-items:flex-end;justify-content:center}
+.sheet{width:100%;max-width:560px;background:linear-gradient(160deg,#262a6e,#163c5c);border:1px solid var(--line);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(0,0,0,.4)}
 /* Board */
 .podium{display:grid;gap:12px}
 .pcard{border-radius:var(--radius);padding:16px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.25)}
@@ -120,7 +155,8 @@ input:focus,select:focus{outline:2px solid var(--ice);outline-offset:1px}
 .row > *{flex:1}
 .field{display:grid;gap:4px;margin-bottom:10px}
 .field label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
-.edit-item{display:grid;grid-template-columns:52px 1fr 64px 40px;gap:6px;align-items:center;margin-bottom:8px}
+.edit-item{display:grid;grid-template-columns:46px 1fr 54px 40px 40px;gap:6px;align-items:center;margin-bottom:8px}
+.edit-item.add{grid-template-columns:46px 1fr 54px 40px}
 .edit-item input{padding:9px 8px}
 .edit-item .em-in{text-align:center;font-size:20px}
 .iconbtn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(255,107,157,.18);display:grid;place-items:center}
@@ -321,15 +357,29 @@ const meta=()=>S.room.meta;
 const endKey=()=>addDays(meta().start,meta().days-1);
 const people=()=>Object.entries(S.room.people||{}).map(([id,p])=>({id,...p})).sort((a,b)=>(a.joined||0)-(b.joined||0));
 const allItems=()=>Object.entries(S.room.items||{}).map(([id,it])=>({id,...it})).sort((a,b)=>(a.order||0)-(b.order||0));
-const itemsOn=k=>allItems().filter(it=>(!it.since||it.since<=k)&&(!it.until||k<it.until));
+const itemsOn=k=>allItems().filter(it=>(!it.since||it.since<=k)&&(!it.until||k<it.until)).map(it=>itemAt(it,k));
+/* hist[X] holds the version that applied to days before X, so edits never rewrite the past */
+function itemAt(it,k){
+  const next=Object.keys(it.hist||{}).filter(x=>x>k).sort()[0];
+  return next?{...it,...it.hist[next],optional:!!it.hist[next].optional}:it;
+}
+function editItem(id,changes){
+  const it=S.room.items[id];const t=todayKey();
+  const versioned=anyChecks()&&(it.since||meta().start)<t&&!(it.hist||{})[t];
+  if(versioned)write(`items/${id}/hist/${t}`,{label:it.label,emoji:it.emoji||"\u2B50",pts:Number(it.pts)||0,optional:!!it.optional});
+  for(const [f,v] of Object.entries(changes))write(`items/${id}/${f}`,v);
+  return versioned;
+}
 const checked=(pid,k,iid)=>!!(((S.room.checks||{})[pid]||{})[k]||{})[iid];
 const anyChecks=()=>Object.keys(S.room.checks||{}).length>0;
 
+const sumPts=its=>its.reduce((s,it)=>s+(Number(it.pts)||0),0);
 function dayStats(pid,k){
-  const its=itemsOn(k);const done=its.filter(it=>checked(pid,k,it.id));
-  const pct=its.length?done.length/its.length:0;
-  const pts=done.reduce((s,it)=>s+(Number(it.pts)||0),0)+(its.length&&pct===1?PERFECT_BONUS:0);
-  return {total:its.length,done:done.length,pct,pts};
+  const its=itemsOn(k);const req=its.filter(it=>!it.optional);
+  const done=req.filter(it=>checked(pid,k,it.id));const optDone=its.filter(it=>it.optional&&checked(pid,k,it.id));
+  const pct=req.length?done.length/req.length:0;
+  const pts=sumPts(done)+sumPts(optDone)+(req.length&&pct===1?PERFECT_BONUS:0);
+  return {total:req.length,done:done.length,pct,pts,optTotal:its.length-req.length,optDone:optDone.length};
 }
 function challengeDays(){
   const out=[];const t=todayKey(),st=meta().start,end=endKey();
@@ -340,14 +390,14 @@ function challengeDays(){
 }
 function personSummary(pid){
   const thr=(meta().streakPct??80)/100;const days=challengeDays();const t=todayKey();
-  let points=0,perfect=0,best=0,run=0;
-  const stats=days.map(k=>{const s=dayStats(pid,k);points+=s.pts;if(s.total&&s.pct===1)perfect++;return [k,s]});
+  let points=0,perfect=0,best=0,run=0,bonus=0;
+  const stats=days.map(k=>{const s=dayStats(pid,k);points+=s.pts;bonus+=s.optDone;if(s.total&&s.pct===1)perfect++;return [k,s]});
   for(const [k,s] of stats){if(s.total&&s.pct>=thr){run++;best=Math.max(best,run)}else if(k!==t)run=0}
   let streak=0;
   for(let i=stats.length-1;i>=0;i--){const [k,s]=stats[i];if(s.total&&s.pct>=thr)streak++;else if(k===t)continue;else break}
   const today=dayStats(pid,t);
   const avg=stats.length?stats.reduce((a,[,s])=>a+s.pct,0)/stats.length:0;
-  return {points,perfect,best,streak,today,avg};
+  return {points,perfect,best,streak,today,avg,bonus};
 }
 function leaderboard(){
   return people().map(p=>({...p,...personSummary(p.id)})).sort((a,b)=>b.points-a.points||b.streak-a.streak||b.today.pct-a.today.pct);
@@ -381,35 +431,57 @@ function ring(pct,size=104,stroke=11){
   return `<div class="ring" style="width:${size}px;height:${size}px"><svg width="${size}" height="${size}"><defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#8be9fd"/><stop offset=".5" stop-color="#b388ff"/><stop offset="1" stop-color="#ff6b9d"/></linearGradient></defs>
   <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="rgba(255,255,255,.14)" stroke-width="${stroke}" fill="none"/>
   <circle cx="${size/2}" cy="${size/2}" r="${r}" stroke="${pct>=1?"#ffd166":"url(#g)"}" stroke-width="${stroke}" fill="none" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct)}" style="transition:stroke-dashoffset .5s"/></svg>
-  <div class="pct">${Math.round(pct*100)}%</div></div>`;
+  <div class="pct" style="font-size:${Math.round(size*.27)}px">${Math.round(pct*100)}%</div></div>`;
 }
 
 function renderToday(){
   const k=S.day,t=todayKey(),m=meta();
-  const st=dayStats(S.me,k);const its=itemsOn(k);
+  const st=dayStats(S.me,k);
   const dayNo=diffDays(m.start,k)+1;
   const inRange=dayNo>=1&&dayNo<=m.days;
-  const sum=personSummary(S.me);
   const lbl=k===t?"Today":k===addDays(t,-1)?"Yesterday":fmtDay(k);
   const sub=inRange?`Day ${dayNo} of ${m.days} · ${fmtDay(k)}`:dayNo<1?`Starts in ${1-dayNo} day${dayNo===0?"":"s"} · practice run`:`Arc finished · ${fmtDay(k)}`;
   const msg=st.pct>=1?["PERFECT DAY! \u{1F389}",`+${st.pts} pts incl. ${PERFECT_BONUS} bonus`]:st.pct>=.5?["Over halfway, keep going! \u{1F4AA}",`${st.total-st.done} left to lock in`]:st.done?["Momentum! ⚡",`${st.total-st.done} to go`]:[k===t?"Fresh day, fresh arc ❄️":"Nothing ticked",QUOTES[(dayNo+QUOTES.length*9)%QUOTES.length]];
-  const others=people().filter(p=>p.id!==S.me);
+  const ps=[{id:S.me,...S.room.people[S.me]},...people().filter(p=>p.id!==S.me)];
+  const its=itemsOn(k);const req=its.filter(it=>!it.optional),opt=its.filter(it=>it.optional);
+  const stats=Object.fromEntries(ps.map(p=>[p.id,dayStats(p.id,k)]));
+  const streak=Object.fromEntries(ps.map(p=>[p.id,personSummary(p.id).streak]));
+  const top=Math.max(...ps.map(p=>stats[p.id].pts));const leaders=ps.filter(p=>stats[p.id].pts===top);
+  const n=ps.length,colW=n>2?72:86;
+  const cell=(p,it)=>{const on=checked(p.id,k,it.id);
+    return p.id===S.me?`<button class="cc mine ${on?"on":""}" onclick="toggle('${it.id}')" aria-pressed="${on}" aria-label="${esc(it.label)}"><span class="box">${on?"✓":""}</span></button>`
+      :`<span class="cc" aria-label="${esc(p.name)}: ${on?"done":"not yet"}"><span class="tick" ${on?`style="background:${esc(p.color)};border-color:${esc(p.color)}"`:""}>${on?"✓":""}</span></span>`};
+  const row=it=>`<button class="lab" onclick="openEdit('${it.id}')" aria-label="Edit ${esc(it.label)}"><span class="em">${esc(it.emoji||"\u2B50")}</span><span class="tx"><b>${esc(it.label)}</b><small>+${Number(it.pts)||0} pts \u00B7 \u270E</small></span></button>${ps.map(p=>cell(p,it)).join("")}`;
+  const head=p=>{const s=stats[p.id];const lead=n>1&&top>0&&leaders.length===1&&leaders[0].id===p.id;
+    return `<div class="ph ${p.id===S.me?"me":""}" style="--c:${esc(p.color)}">${lead?`<span class="crown">\u{1F451}</span>`:""}${ring(s.pct,58,7)}<b>${esc(p.id===S.me?"You":p.name)}</b><small>⭐${s.pts} · \u{1F525}${streak[p.id]}</small>${s.optDone?`<small>✨+${s.optDone}</small>`:""}</div>`};
   shell(`
   <div class="daynav">
     <button aria-label="Previous day" onclick="shiftDay(-1)" ${k<=addDays(m.start,-7)?"disabled":""}>◀</button>
     <div class="lbl"><b>${lbl}</b><span>${sub}</span></div>
     <button aria-label="Next day" onclick="shiftDay(1)" ${k>=t?"disabled":""}>▶</button>
   </div>
-  <section class="card hero">${ring(st.pct)}<div class="msg"><b>${msg[0]}</b>${esc(msg[1])}
-    <div class="chips"><span class="chip">\u{1F525} ${sum.streak} day streak</span><span class="chip">⭐ ${sum.points} pts</span></div></div></section>
-  <section class="items">${its.length?its.map(it=>{const on=checked(S.me,k,it.id);return `
-    <button class="item ${on?"on":""}" onclick="toggle('${it.id}')" aria-pressed="${on}">
-      <span class="em">${esc(it.emoji||"⭐")}</span><span class="t"><b>${esc(it.label)}</b><span>+${Number(it.pts)||0} pts</span></span><span class="box">${on?"✓":""}</span>
-    </button>`}).join(""):`<div class="card center">No checklist items yet. <button class="btn small" onclick="go('settings')">Add some</button></div>`}</section>
-  ${others.length?`<section class="card" style="margin-top:14px"><h3 style="font-size:17px;margin-bottom:10px">${k===t?"Your crew today":"Your crew that day"}</h3><div class="friends">${others.map(p=>{const s=dayStats(p.id,k);return `
-    <div class="frow">${avatar(p)}<span class="n">${esc(p.name)}</span><span class="bar"><i style="width:${s.pct*100}%;background:${esc(p.color)}"></i></span><span class="v">${s.done}/${s.total}</span></div>`}).join("")}</div></section>`:
-  `<section class="card center" style="margin-top:14px"><b>Arc is better together \u{1F91D}</b><p class="muted">${S.cfg.local?"This is demo mode on one device. Set up a shared link from Setup to invite a friend.":"Send your friend the invite link so they can join."}</p>${S.cfg.local?"":`<button class="btn" onclick="shareInvite()">Invite a friend</button>`}</section>`}
+  <section class="card banner"><b>${msg[0]}</b> <span class="muted">${esc(msg[1])}</span></section>
+  <section class="card cmpcard">
+    <div class="cmp"><div class="cgrid ${n>2?"wide":""}" style="grid-template-columns:minmax(118px,1fr) repeat(${n},${colW}px)">
+      <div class="lab head">${n>1?(leaders.length>1&&top>0?"⚖️ Neck and neck":"Head to head"):"Your day"}</div>${ps.map(head).join("")}
+      ${req.length?req.map(row).join(""):`<div class="sec">No daily habits yet. <button class="btn small" onclick="go('settings')">Add some</button></div>`}
+      ${opt.length?`<div class="sec">✨ Bonus / optional <small>extra points, never lowers your %</small></div>${opt.map(row).join("")}`:""}
+    </div></div>
+    <p class="muted" style="margin:10px 0 0;text-align:center">Tap a habit to tweak it. Changes apply from today; past days stay as they were.</p>
+    ${S.optForm?`<div class="optform">
+      <input class="em-in" id="qEm" value="✨" maxlength="4" aria-label="Optional habit emoji">
+      <input id="qLabel" placeholder="e.g. Cold shower" maxlength="40" aria-label="Optional habit name" onkeydown="if(event.key==='Enter')quickAddOptional()">
+      <input type="number" id="qPts" min="0" max="100" value="5" aria-label="Bonus points">
+      <button class="iconbtn" style="background:rgba(123,241,168,.3)" aria-label="Add optional habit" onclick="quickAddOptional()">➕</button>
+    </div>`:`<button class="btn ghost small addopt" onclick="S.optForm=true;renderToday();$('#qLabel').focus()">+ optional habit</button>`}
+  </section>
+  ${n>1?"":`<section class="card center"><b>Arc is better together \u{1F91D}</b><p class="muted">${S.cfg.local?"This is demo mode on one device. Set up a shared link from Setup to invite a friend.":"Send your friend the invite link so they can join."}</p>${S.cfg.local?"":`<button class="btn" onclick="shareInvite()">Invite a friend</button>`}</section>`}
   `);
+}
+function quickAddOptional(){
+  const label=$("#qLabel").value.trim();if(!label){$("#qLabel").focus();return}
+  createItem({label,emoji:$("#qEm").value,pts:$("#qPts").value,optional:true});
+  S.optForm=false;renderToday();toast(`Bonus habit "${label}" added ✨`);
 }
 function shiftDay(n){const t=todayKey();let k=addDays(S.day,n);if(k>t)k=t;S.day=k;renderToday()}
 function toggle(iid){
@@ -443,7 +515,7 @@ function renderBoard(){
         <div class="stat"><b>${p.best}</b><span>Best</span></div>
         <div class="stat"><b>⭐${p.perfect}</b><span>Perfect</span></div>
       </div>
-      <div class="muted" style="color:#fff;opacity:.85;margin-top:8px;font-weight:700">Average completion ${Math.round(p.avg*100)}%</div>
+      <div class="muted" style="color:#fff;opacity:.85;margin-top:8px;font-weight:700">Average completion ${Math.round(p.avg*100)}% \u00B7 \u2728 ${p.bonus} bonus habit${p.bonus===1?"":"s"}</div>
     </div>`).join("")}</section>
   <p class="muted center" style="margin-top:14px">Points = item points + ${PERFECT_BONUS} bonus for a 100% day. A streak day needs ≥ ${m.streakPct??80}% done.</p>
   `);
@@ -476,23 +548,28 @@ function openDay(k){S.day=k;go("today")}
 const EMOJI_PICK=["\u{1F3CB}️","\u{1F3C3}","\u{1F6B6}","\u{1F9D8}","\u{1F4A7}","\u{1F957}","\u{1F34E}","\u{1F634}","\u{1F4DA}","✍️","\u{1F4F5}","\u{1F6BF}","\u{1F31E}","\u{1F48A}","\u{1F9E0}","\u{1F64F}","\u{1F6AD}","\u{1F4B0}","\u{1F9F9}","⭐"];
 function renderSettings(){
   const m=meta();const me=S.room.people[S.me];const its=allItems().filter(it=>!it.until);
-  shell(`
-  <section class="card">
-    <h2 style="font-size:20px;margin-bottom:12px">\u{1F4CB} Daily checklist <span class="muted">(shared)</span></h2>
-    <div id="items">${its.map(it=>`
+  const editRow=it=>`
       <div class="edit-item" data-id="${it.id}">
         <input class="em-in" value="${esc(it.emoji)}" maxlength="4" aria-label="Emoji" onchange="saveItem('${it.id}','emoji',this.value)">
         <input value="${esc(it.label)}" maxlength="40" aria-label="Item name" onchange="saveItem('${it.id}','label',this.value)">
         <input type="number" min="0" max="100" value="${Number(it.pts)||0}" aria-label="Points" onchange="saveItem('${it.id}','pts',this.value)">
+        <button class="iconbtn opt ${it.optional?"on":""}" aria-label="${it.optional?"Make required":"Make optional"}" title="${it.optional?"Optional (bonus). Tap to make required":"Required. Tap to make optional"}" onclick="saveItem('${it.id}','optional',${!it.optional})">\u2728</button>
         <button class="iconbtn" aria-label="Remove ${esc(it.label)}" onclick="removeItem('${it.id}')">\u{1F5D1}️</button>
-      </div>`).join("")}</div>
-    <div class="muted" style="margin:4px 0 8px">Emoji · name · points</div>
-    <div class="edit-item">
+      </div>`;
+  shell(`
+  <section class="card">
+    <h2 style="font-size:20px;margin-bottom:12px">\u{1F4CB} Daily checklist <span class="muted">(shared)</span></h2>
+    <div id="items">${its.filter(it=>!it.optional).map(editRow).join("")}</div>
+    <h3 style="font-size:16px;margin:12px 0 8px">\u2728 Bonus / optional <span class="muted">(extra points, never counted in %)</span></h3>
+    <div id="optItems">${its.filter(it=>it.optional).map(editRow).join("")||`<p class="muted">None yet.</p>`}</div>
+    <div class="muted" style="margin:4px 0 8px">Emoji · name · points · \u2728 optional toggle</div>
+    <div class="edit-item add">
       <input class="em-in" id="newEm" value="⭐" maxlength="4" aria-label="New item emoji">
       <input id="newLabel" placeholder="e.g. Cold shower" maxlength="40" aria-label="New item name" onkeydown="if(event.key==='Enter')addItem()">
       <input type="number" id="newPts" min="0" max="100" value="10" aria-label="New item points">
       <button class="iconbtn" style="background:rgba(123,241,168,.3)" aria-label="Add item" onclick="addItem()">➕</button>
     </div>
+    <label class="check"><input type="checkbox" id="newOpt"> Optional bonus habit (doesn't affect %, streak or perfect day)</label>
     <div class="emojis" style="margin-top:6px">${EMOJI_PICK.map(e=>`<button onclick="$('#newEm').value='${e}'">${e}</button>`).join("")}</div>
   </section>
   <section class="card">
@@ -527,13 +604,52 @@ function renderSettings(){
     <button class="btn ghost small" onclick="resetDevice()">Leave this challenge on this device</button></details>
   </section>`);
 }
-function saveItem(id,f,v){if(f==="pts")v=Math.max(0,Math.min(100,parseInt(v)||0));else v=String(v).trim();if(f==="label"&&!v)return renderSettings();write(`items/${id}/${f}`,v);toast("Saved ✔")}
-function addItem(){
-  const label=$("#newLabel").value.trim();if(!label){$("#newLabel").focus();return}
-  const id=uid(8);const t=todayKey();
+const updatedToast=versioned=>toast(versioned?"Habit updated from today \u2728 Past days stay as they were":"Habit updated \u2728");
+function saveItem(id,f,v){
+  if(f==="optional")v=v?true:null;else if(f==="pts")v=Math.max(0,Math.min(100,parseInt(v)||0));else v=String(v).trim();
+  if(f==="label"&&!v)return render();
+  const versioned=editItem(id,{[f]:v});render();updatedToast(versioned);
+}
+function openEdit(id){
+  const it=S.room.items[id];if(!it)return;
+  closeSheet();
+  const d=document.createElement("div");d.className="sheet-bg";d.id="sheet";d.onclick=e=>{if(e.target===d)closeSheet()};
+  d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true" aria-label="Edit habit">
+    <h3 style="font-size:20px;margin-bottom:12px">\u270F\uFE0F Edit habit</h3>
+    <div class="optform" style="grid-template-columns:52px 1fr 64px;margin-top:0">
+      <input class="em-in" id="eEm" value="${esc(it.emoji||"\u2B50")}" maxlength="4" aria-label="Emoji">
+      <input id="eLabel" value="${esc(it.label)}" maxlength="40" aria-label="Habit name">
+      <input type="number" id="ePts" min="0" max="100" value="${Number(it.pts)||0}" aria-label="Points">
+    </div>
+    <label class="check" style="margin:12px 0"><input type="checkbox" id="eOpt" ${it.optional?"checked":""}> \u2728 Optional bonus habit (never lowers your %)</label>
+    <p class="muted">Changes apply from today for everyone. Past days keep the version they had.</p>
+    <button class="btn" onclick="saveEdit('${id}')">Save</button>
+    <div class="row" style="margin-top:8px"><button class="btn ghost" onclick="closeSheet()">Cancel</button><button class="btn ghost" style="color:#ff9fbf" onclick="closeSheet();removeItem('${id}')">Remove</button></div>
+  </div>`;
+  document.body.appendChild(d);
+}
+function closeSheet(){const d=$("#sheet");if(d)d.remove()}
+function saveEdit(id){
+  const it=S.room.items[id];const label=$("#eLabel").value.trim();if(!label){$("#eLabel").focus();return}
+  const next={label,emoji:$("#eEm").value.trim()||"\u2B50",pts:Math.max(0,Math.min(100,parseInt($("#ePts").value)||0)),optional:$("#eOpt").checked};
+  const changes={};
+  for(const f of ["label","emoji","pts"])if(next[f]!==it[f])changes[f]=next[f];
+  if(next.optional!==!!it.optional)changes.optional=next.optional?true:null;
+  closeSheet();
+  if(!Object.keys(changes).length)return;
+  const versioned=editItem(id,changes);render();updatedToast(versioned);
+}
+function createItem({label,emoji,pts,optional}){
+  const t=todayKey();
   const since=!anyChecks()||t<meta().start?meta().start:t;
   const order=Math.max(0,...allItems().map(i=>i.order||0))+1;
-  write(`items/${id}`,{label,emoji:$("#newEm").value.trim()||"⭐",pts:Math.max(0,Math.min(100,parseInt($("#newPts").value)||0)),order,since});
+  const item={label,emoji:String(emoji||"").trim()||"\u2B50",pts:Math.max(0,Math.min(100,parseInt(pts)||0)),order,since};
+  if(optional)item.optional=true;
+  write(`items/${uid(8)}`,item);
+}
+function addItem(){
+  const label=$("#newLabel").value.trim();if(!label){$("#newLabel").focus();return}
+  createItem({label,emoji:$("#newEm").value,pts:$("#newPts").value,optional:$("#newOpt").checked});
   renderSettings();toast(`Added "${label}" for everyone \u{1F389}`);
 }
 function removeItem(id){
@@ -541,7 +657,7 @@ function removeItem(id){
   const used=Object.values(S.room.checks||{}).some(byDay=>Object.values(byDay).some(d=>d[id]));
   const t=todayKey();
   if(used&&t>(it.since||meta().start))write(`items/${id}/until`,t);else write(`items/${id}`,null);
-  renderSettings();toast("Removed");
+  render();toast("Removed from today on. Past days keep it \u{1F44D}");
 }
 function saveMeta(f,v){write(`meta/${f}`,v);render();toast("Saved ✔")}
 function savePerson(f,v){write(`people/${S.me}/${f}`,v);render()}
