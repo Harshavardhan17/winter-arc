@@ -56,6 +56,11 @@ No build step. Files: `index.html`, `manifest.webmanifest`, `sw.js`, `icons/`.
   while it is still in progress.
 - Adding an item mid-challenge counts from today; removing one keeps past days intact.
 - You can tap past days in the Calendar to fix a missed tick.
+- Optional (bonus) habits add their points when ticked but never count toward the daily %,
+  perfect day or streak. Add one any time with "+ optional habit" on the Today screen.
+- Tap any habit on the Today screen to rename it, change points, flip required/optional or remove it.
+  Edits apply from today forward; past days keep the version they had, so history, streaks and the
+  leaderboard are never rewritten.
 
 ## Privacy note
 
